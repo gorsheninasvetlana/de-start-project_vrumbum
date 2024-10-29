@@ -33,7 +33,7 @@ CREATE TABLE car_shop.model (
 CREATE TABLE car_shop.customer (
     customer_id SERIAL PRIMARY KEY,
     person_name VARCHAR(100) NOT NULL, /* VARCHAR(100) — имя покупателя должно быть обязательным для заполнения */
-    phone VARCHAR(20) UNIQUE NOT NULL /* VARCHAR(20) — телефон покупателя должен быть уникальным и обязательным для заполнения */
+    phone VARCHAR(50) UNIQUE NOT NULL /* VARCHAR(50) — телефон покупателя должен быть уникальным и обязательным для заполнения */
 );
 
 -- Таблица продаж
