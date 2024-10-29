@@ -4,43 +4,48 @@ CREATE SCHEMA IF NOT EXISTS car_shop;
 -- Таблица стран
 CREATE TABLE car_shop.country (
     country_id SERIAL PRIMARY KEY,
-    country_name VARCHAR(50) UNIQUE /* VARCHAR(50) — название страны может содержать как буквы, так и символы, например, пробелы, поэтому используем VARCHAR. 50 символов достаточно для любых названий стран */
+    country_name VARCHAR(50) UNIQUE NOT NULL /* VARCHAR(50) — название страны, должно быть уникальным и обязательным для заполнения */
 );
 
 -- Таблица брендов
 CREATE TABLE car_shop.brand (
     brand_id SERIAL PRIMARY KEY,
-    brand_name VARCHAR(50) UNIQUE /* VARCHAR(50) — название бренда может содержать только буквы (например, "BMW", "Toyota"), поэтому выбран тип данных VARCHAR. Ограничение длины до 50 символов. */,
-    country_id INT REFERENCES car_shop.country(country_id) /* INT — используется для хранения внешнего ключа, который ссылается на таблицу country */
+    brand_name VARCHAR(50) UNIQUE NOT NULL, /* VARCHAR(50) — название бренда должно быть уникальным и обязательным для заполнения */
+    country_id INT, /* INT — внешний ключ на таблицу country */
+    CONSTRAINT fk_country FOREIGN KEY (country_id) REFERENCES car_shop.country(country_id) /* Ограничение целостности, обеспечивающее связь с таблицей country */
 );
 
 -- Таблица цветов
 CREATE TABLE car_shop.color (
     color_id SERIAL PRIMARY KEY,
-    color_name VARCHAR(50) UNIQUE /* VARCHAR(50) — название цвета автомобиля может включать буквы, цифры или даже специальные символы (например, пробелы или дефисы), поэтому VARCHAR. Ограничение 50 символов достаточно для хранения любых цветов */
+    color_name VARCHAR(50) UNIQUE NOT NULL /* VARCHAR(50) — название цвета, должно быть уникальным и обязательным для заполнения */
 );
 
 -- Таблица моделей автомобилей
 CREATE TABLE car_shop.model (
     model_id SERIAL PRIMARY KEY,
-    model_name VARCHAR(100) UNIQUE /* VARCHAR(100) — название модели может включать буквы, цифры и символы, например, "X5" или "Model S". Ограничение 100 символов для учёта длинных названий моделей */,
-    brand_id INT REFERENCES car_shop.brand(brand_id) /* INT — используется для хранения внешнего ключа, который ссылается на таблицу brand */
+    model_name VARCHAR(100) UNIQUE NOT NULL, /* VARCHAR(100) — название модели должно быть уникальным и обязательным для заполнения */
+    brand_id INT NOT NULL, /* INT — внешний ключ на таблицу brand, обязательное поле */
+    CONSTRAINT fk_brand FOREIGN KEY (brand_id) REFERENCES car_shop.brand(brand_id) /* Ограничение целостности, обеспечивающее связь с таблицей brand */
 );
 
 -- Таблица покупателей
 CREATE TABLE car_shop.customer (
     customer_id SERIAL PRIMARY KEY,
-    person_name VARCHAR(100) /* VARCHAR(100) — используется для хранения имени покупателя, которое может включать буквы, пробелы и символы, например, апострофы. Ограничение 100 символов для обеспечения гибкости */,
-    phone VARCHAR(20) UNIQUE /* VARCHAR(20) — используется для хранения телефонного номера, который может содержать цифры, плюс, дефисы и другие символы. Ограничение 20 символов достаточно для всех международных форматов */
+    person_name VARCHAR(100) NOT NULL, /* VARCHAR(100) — имя покупателя должно быть обязательным для заполнения */
+    phone VARCHAR(20) UNIQUE NOT NULL /* VARCHAR(20) — телефон покупателя должен быть уникальным и обязательным для заполнения */
 );
 
 -- Таблица продаж
 CREATE TABLE car_shop.sale (
     sale_id SERIAL PRIMARY KEY,
-    date DATE /* DATE — используется для хранения даты продажи. Тип данных DATE идеально подходит для хранения дат без времени */,
-    price NUMERIC(9, 2) /* NUMERIC(9, 2) — цена может содержать только сотые и не может быть больше девятизначной суммы (включая две дробные цифры). Используем NUMERIC для точных расчетов с дробными числами */,
-    discount INT /* INT — используется для хранения целочисленного значения скидки, например, в процентах */,
-    model_id INT REFERENCES car_shop.model(model_id) /* INT — внешний ключ, ссылающийся на таблицу model */,
-    color_id INT REFERENCES car_shop.color(color_id) /* INT — внешний ключ, ссылающийся на таблицу color */,
-    customer_id INT REFERENCES car_shop.customer(customer_id) /* INT — внешний ключ, ссылающийся на таблицу customer */
+    date DATE NOT NULL, /* DATE — дата продажи, обязательное поле */
+    price NUMERIC(9, 2) NOT NULL, /* NUMERIC(9, 2) — цена продажи, обязательное поле */
+    discount INT DEFAULT 0, /* INT — скидка, по умолчанию 0 (если не указана) */
+    model_id INT NOT NULL, /* INT — внешний ключ на таблицу model, обязательное поле */
+    color_id INT NOT NULL, /* INT — внешний ключ на таблицу color, обязательное поле */
+    customer_id INT NOT NULL, /* INT — внешний ключ на таблицу customer, обязательное поле */
+    CONSTRAINT fk_model FOREIGN KEY (model_id) REFERENCES car_shop.model(model_id), /* Ограничение целостности, обеспечивающее связь с таблицей model */
+    CONSTRAINT fk_color FOREIGN KEY (color_id) REFERENCES car_shop.color(color_id), /* Ограничение целостности, обеспечивающее связь с таблицей color */
+    CONSTRAINT fk_customer FOREIGN KEY (customer_id) REFERENCES car_shop.customer(customer_id) /* Ограничение целостности, обеспечивающее связь с таблицей customer */
 );
