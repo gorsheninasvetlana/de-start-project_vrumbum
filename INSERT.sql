@@ -10,7 +10,7 @@ SELECT DISTINCT
     split_part(auto, ' ', 1) AS brand_name,
     country.country_id
 FROM raw_data.sales s
-JOIN car_shop.country country ON s.brand_origin = country.country_name;
+LEFT JOIN car_shop.country country ON s.brand_origin = country.country_name;
 
 -- Заполнение таблицы color
 INSERT INTO car_shop.color (color_name)
@@ -19,12 +19,13 @@ SELECT DISTINCT
 FROM raw_data.sales;
 
 -- Заполнение таблицы model
-INSERT INTO car_shop.model (model_name, brand_id)
+INSERT INTO car_shop.model (model_name, brand_id, gasoline_consumption)
 SELECT DISTINCT
-    split_part(auto, ' ', 2) AS model_name,
-    brand.brand_id
+    SUBSTR(SPLIT_PART(auto, ',', 1),(STRPOS(SPLIT_PART(auto, ',', 1),' ')+1)) AS model_name,
+    brand.brand_id,
+    s.gasoline_consumption::NUMERIC(5,2)
 FROM raw_data.sales s
-JOIN car_shop.brand brand ON split_part(s.auto, ' ', 1) = brand.brand_name;
+JOIN car_shop.brand brand ON SPLIT_PART(s.auto, ' ', 1) = brand.brand_name;
 
 -- Заполнение таблицы customer
 INSERT INTO car_shop.customer (person_name, phone)
@@ -37,10 +38,10 @@ SELECT
     date::DATE, 
     price, 
     discount,
-    model.model_id,
-    color.color_id,
-    customer.customer_id
+    m.model_id,
+    cl.color_id,
+    cus.customer_id
 FROM raw_data.sales s
-JOIN car_shop.model model ON split_part(s.auto, ' ', 2) = model.model_name
-JOIN car_shop.color color ON TRIM(BOTH ' ' FROM split_part(s.auto, ',', 2)) = color.color_name
-JOIN car_shop.customer customer ON s.person_name = customer.person_name AND s.phone = customer.phone;
+JOIN car_shop.model m ON SUBSTR(SPLIT_PART(auto, ',', 1),(STRPOS(SPLIT_PART(auto, ',', 1),' ')+1)) = m.model_name
+JOIN car_shop.color cl ON TRIM(BOTH ' ' FROM split_part(s.auto, ',', 2)) = cl.color_name
+JOIN car_shop.customer cus ON s.person_name = cus.person_name AND s.phone = cus.phone;
