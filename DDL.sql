@@ -11,7 +11,7 @@ CREATE TABLE car_shop.country (
 CREATE TABLE car_shop.brand (
     brand_id SERIAL PRIMARY KEY,
     brand_name VARCHAR(50) UNIQUE NOT NULL, /* VARCHAR(50) — название бренда должно быть уникальным и обязательным для заполнения */
-    country_id INT, /* INT — внешний ключ на таблицу country */
+    country_id INT, /* INT — внешний ключ на таблицу country, обязательное поле, нет ограничения на обязательность заполнения */
     CONSTRAINT fk_country FOREIGN KEY (country_id) REFERENCES car_shop.country(country_id) /* Ограничение целостности, обеспечивающее связь с таблицей country */
 );
 
@@ -25,6 +25,7 @@ CREATE TABLE car_shop.color (
 CREATE TABLE car_shop.model (
     model_id SERIAL PRIMARY KEY,
     model_name VARCHAR(100) UNIQUE NOT NULL, /* VARCHAR(100) — название модели должно быть уникальным и обязательным для заполнения */
+    gasoline_consumption NUMERIC(5, 2), /* NUMERIC(5, 2) — числовой тип с двумя знаками после запятой, позволяет хранить значения до 999.99, может быть NULL */
     brand_id INT NOT NULL, /* INT — внешний ключ на таблицу brand, обязательное поле */
     CONSTRAINT fk_brand FOREIGN KEY (brand_id) REFERENCES car_shop.brand(brand_id) /* Ограничение целостности, обеспечивающее связь с таблицей brand */
 );
@@ -33,7 +34,7 @@ CREATE TABLE car_shop.model (
 CREATE TABLE car_shop.customer (
     customer_id SERIAL PRIMARY KEY,
     person_name VARCHAR(100) NOT NULL, /* VARCHAR(100) — имя покупателя должно быть обязательным для заполнения */
-    phone VARCHAR(50) UNIQUE NOT NULL /* VARCHAR(50) — телефон покупателя должен быть уникальным и обязательным для заполнения */
+    phone VARCHAR(30) UNIQUE NOT NULL /* VARCHAR(30) — телефон покупателя, должен быть уникальным и обязательным для заполнения */
 );
 
 -- Таблица продаж
